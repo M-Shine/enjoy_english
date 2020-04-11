@@ -17,7 +17,7 @@ public class User implements Serializable {
     @Column(name = "tel_no")
     private String telno;
     // 角色默认值为1，不赋值的话该变量会被默认初始化为0
-    private short role = 1;
+    private int role = 1;
     @Column(name = "register_datetime")
     private Timestamp registerdatetime;
 
@@ -62,11 +62,11 @@ public class User implements Serializable {
         this.telno = telno;
     }
 
-    public short getRole() {
+    public int getRole() {
         return role;
     }
 
-    public void setRole(short role) {
+    public void setRole(int role) {
         this.role = role;
     }
 }

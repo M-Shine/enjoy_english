@@ -114,7 +114,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-//                .anyRequest().authenticated()
                 .antMatchers("/").permitAll()   //"/"路径下的接口不需要权限
                 .antMatchers("/management/**").hasRole("ADMIN") //"/management/**"路径下的接口需要有管理员权限
                 .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")

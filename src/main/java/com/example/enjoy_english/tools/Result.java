@@ -13,11 +13,11 @@ public class Result {
         this.data = data;
     }
 
-    public static Result success(String message, Object data){
+    public Result success(String message, Object data){
         return new Result(1, message, data);
     }
 
-    public static Result error(String message){
+    public Result error(String message){
         return new Result(0, message, null);
     }
 
