@@ -1,20 +1,15 @@
 package com.example.enjoy_english.controller;
 
-import com.example.enjoy_english.model.QA;
+import com.example.enjoy_english.model.Menu;
 import com.example.enjoy_english.service.MenuService;
 import com.example.enjoy_english.service.QAService;
 import com.example.enjoy_english.tools.PageResult;
 import com.example.enjoy_english.tools.Result;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @RestController
 public class DataManagementController {
@@ -33,19 +28,19 @@ public class DataManagementController {
     @GetMapping("/api/getQA")
     public PageResult getQA(String category, String group,
                         @PageableDefault(page = 0, size = 10)Pageable pageable){
-        if (category == null || group == null){
-            return new PageResult().error("类别 / 组别 不能为空");
-        }
-        Page<QA> qaPage = qaService.findAllByCategoryAndGroup(category, group, pageable);
-        List<QA> qaList = qaPage.getContent();
-        List<HashMap<String, String>> result = new ArrayList<>();
-        for (QA qa : qaList){
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("itemq", qa.getItemq());
-            map.put("itema", qa.getItema());
-            result.add(map);
-        }
-        return new PageResult().success(null, result, qaPage.getNumber(), qaPage.getSize());
+        return qaService.getQA(category, group, pageable);
+    }
+
+    //添加菜单选项
+    @PostMapping("/management/addMenu")
+    public Result addMenu(@RequestBody Menu menu){
+        return menuService.addMenu(menu);
+    }
+
+    //删除菜单选项
+    @GetMapping("/management/deleteMenu")
+    public Result deleteMenu(@RequestParam String groupno){
+        return menuService.deleteMenu(groupno);
     }
 
 }

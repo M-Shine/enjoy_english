@@ -32,8 +32,7 @@ public class UserManagementController {
     public void verificationCode(HttpSession session, HttpServletResponse response) throws IOException {
         VerificationCode verificationCode = new VerificationCode();
         BufferedImage image = verificationCode.getImage();
-        String text = verificationCode.getText();
-        session.setAttribute("verificationCode", text);
+        session.setAttribute("verificationCode", verificationCode.getText());
         VerificationCode.output(image, response.getOutputStream());
     }
 
@@ -41,7 +40,7 @@ public class UserManagementController {
     @GetMapping("/management/getUsers")
     public PageResult getUsers(@PageableDefault(page = 0, size = 10) Pageable pageable){
         Page<User> userPage = userService.findAll(pageable);
-        return new PageResult().success(null, userPage.getContent(), userPage.getNumber(), userPage.getSize());
+        return new PageResult().success(null, userPage.getContent(), userPage.getTotalPages(), userPage.getNumber(), userPage.getSize());
     }
 
     //查询用户个人资料

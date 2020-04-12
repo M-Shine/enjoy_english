@@ -14,7 +14,6 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Pattern;
 
 
