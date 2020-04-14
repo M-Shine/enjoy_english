@@ -1,6 +1,7 @@
 package com.example.enjoy_english.controller;
 
 import com.example.enjoy_english.model.Menu;
+import com.example.enjoy_english.model.QA;
 import com.example.enjoy_english.service.MenuService;
 import com.example.enjoy_english.service.QAService;
 import com.example.enjoy_english.tools.PageResult;
@@ -37,10 +38,34 @@ public class DataManagementController {
         return menuService.addMenu(menu);
     }
 
+    //修改菜单项
+    @PostMapping("/management/updateMenu")
+    public Result updateMenu(@RequestBody Menu menu){
+        return menuService.updateMenu(menu);
+    }
+
     //删除菜单选项
     @GetMapping("/management/deleteMenu")
     public Result deleteMenu(@RequestParam String groupno){
         return menuService.deleteMenu(groupno);
+    }
+
+    //增加QA资料
+    @PostMapping("/management/addQA")
+    public Result addQA(@RequestBody QA qa){
+        return qaService.addQA(qa);
+    }
+
+    //删除QA资料
+    @GetMapping("/management/deleteQA")
+    public Result deleteQA(@RequestParam String itemno){
+        return qaService.deleteQA(itemno);
+    }
+
+    //修改QA资料
+    @PostMapping("/management/updateQA")
+    public Result updateQA(@RequestBody QA qa){
+        return qaService.updateQA(qa);
     }
 
 }

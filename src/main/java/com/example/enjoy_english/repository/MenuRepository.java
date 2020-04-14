@@ -18,4 +18,11 @@ public interface MenuRepository extends JpaRepository<Menu, String> {
     @Modifying
     @Query(value = "delete from Menu where group_no=?1")
     int deleteByGroupno(String groupno);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update menu set category=:#{#menu.category}, `group`=:#{#menu.group} where group_no=:#{#menu.groupno}", nativeQuery = true)
+    int updateMenu(Menu menu);
+
+    Menu findByGroupno(String groupno);
 }

@@ -19,23 +19,24 @@ public class MenuServiceImpl implements MenuService {
     private MenuRepository menuRepository;
 
     @Override
-    public HashMap<String, List<String>> findAll() {
-        HashMap<String, List<String>> menus = new HashMap<>();
+    public HashMap findAll() {
+        HashMap<String, List> menus = new HashMap<>();
         List<Menu> menuList = menuRepository.findAll();
         for (Menu menu : menuList){
             menus.put(menu.getCategory(), new ArrayList<>());
         }
         for (Menu menu : menuList){
-            menus.get(menu.getCategory()).add(menu.getGroup());
+            HashMap<String, String> map = new HashMap<>();
+            map.put("groupno", menu.getGroupno());
+            map.put("group", menu.getGroup());
+            menus.get(menu.getCategory()).add(map);
         }
         return menus;
     }
 
     @Override
     public Result addMenu(Menu menu) {
-        if (menu.getCategory() == null || menu.getGroup() == null || menu.getCategory().trim().equals("")
-                || menu.getGroup().trim().equals("") || menu.getCategory().length() > 20
-                || menu.getGroup().length() > 20){
+        if (!isLegal(menu.getCategory()) || !isLegal(menu.getGroup())){
             return new Result().error("类别 / 组别 填写错误");
         }
         if (menuRepository.findByCategoryAndGroup(menu.getCategory(), menu.getGroup()) != null){
@@ -50,6 +51,25 @@ public class MenuServiceImpl implements MenuService {
     public Result deleteMenu(String groupno) {
         menuRepository.deleteByGroupno(groupno);
         return new Result().success("组代码为" + groupno + "的菜单项已删除", null);
+    }
+
+    @Override
+    public Result updateMenu(Menu menu) {
+        if (!isLegal(menu.getCategory()) || !isLegal(menu.getGroup())){
+            return new Result().error("类别 / 组别 填写错误");
+        }
+        if (menuRepository.findByGroupno(menu.getGroupno()) == null){
+            return new Result().error("组代码为" + menu.getGroupno() + "的菜单项不存在");
+        }
+        menuRepository.updateMenu(menu);
+        return new Result().success("组代码为" + menu.getGroupno() + "的菜单项已修改", menu);
+    }
+
+    boolean isLegal(String str){
+        if (str == null || str.trim().isEmpty() || str.length() > 20){
+            return false;
+        }
+        return true;
     }
 
 }

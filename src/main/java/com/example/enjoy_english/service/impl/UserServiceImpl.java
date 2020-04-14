@@ -59,13 +59,11 @@ public class UserServiceImpl implements UserService {
         if (user.getTelno() != null && ! isTelphoneNum(user.getTelno())){
             return new Result().error("电话号码格式错误");
         }
-        //校验用户角色
-        if (!"1".equals(String.valueOf(user.getRole())) && (user.getRole() != 0 || user.getRole() != 1)){
-            return new Result().error("用户角色设置错误");
-        }
+        //设置用户角色
+        user.setRole(1);
         //设置注册时间
         user.setRegisterdatetime(new Timestamp(new Date().getTime()));
-        return new Result(1, "注册成功", userRepository.save(user));
+        return new Result(1, "注册账户成功", userRepository.save(user));
     }
 
     @Transactional
@@ -100,9 +98,10 @@ public class UserServiceImpl implements UserService {
             }
             new_user.setTelno(user.getTelno());
         }
-        if (isAdmin){
-            new_user.setRole(user.getRole());
-        }
+        new_user.setRole(1);
+//        if (isAdmin){
+//            new_user.setRole(user.getRole());
+//        }
         return new Result().success("资料修改成功",new_user);
     }
 

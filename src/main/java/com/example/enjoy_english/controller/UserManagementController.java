@@ -1,7 +1,6 @@
 package com.example.enjoy_english.controller;
 
 import com.example.enjoy_english.model.User;
-import com.example.enjoy_english.service.MenuService;
 import com.example.enjoy_english.service.UserService;
 import com.example.enjoy_english.tools.PageResult;
 import com.example.enjoy_english.tools.Result;
@@ -22,8 +21,6 @@ import java.util.Collection;
 
 @RestController
 public class UserManagementController {
-    @Resource
-    private MenuService menuService;
     @Resource
     private UserService userService;
 
