@@ -48,9 +48,9 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public Result deleteMenu(String groupno) {
-        menuRepository.deleteByGroupno(groupno);
-        return new Result().success("组代码为" + groupno + "的菜单项已删除", null);
+    public Result deleteMenu(List<String> groupnoList) {
+        menuRepository.deleteByGroupnoList(groupnoList);
+        return new Result().success("已删除", groupnoList);
     }
 
     @Override

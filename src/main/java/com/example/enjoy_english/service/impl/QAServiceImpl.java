@@ -69,11 +69,10 @@ public class QAServiceImpl implements QAService {
         return new Result().success("修改QA资料成功", qa);
     }
 
-    @Transactional
     @Override
-    public Result deleteQA(String itemno){
-        qaRepository.deleteByItemno(itemno);
-        return new Result().success("已删除指标号为" + itemno + "的QA资料",null);
+    public Result deleteQAList(List<String> itemnoList) {
+        qaRepository.deleteQA(itemnoList);
+        return new Result().success("已删除", itemnoList);
     }
 
     boolean isEmpty(String str){

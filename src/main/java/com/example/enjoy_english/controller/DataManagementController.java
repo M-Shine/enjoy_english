@@ -11,6 +11,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 public class DataManagementController {
@@ -23,13 +24,6 @@ public class DataManagementController {
     @GetMapping("/api/getMenus")
     public Result getMenus(){
         return new Result().success(null, menuService.findAll());
-    }
-
-    //分页获取指定类别和组别下的QA资料
-    @GetMapping("/api/getQA")
-    public PageResult getQA(String category, String group,
-                        @PageableDefault(page = 0, size = 10)Pageable pageable){
-        return qaService.getQA(category, group, pageable);
     }
 
     //添加菜单选项
@@ -45,9 +39,16 @@ public class DataManagementController {
     }
 
     //删除菜单选项
-    @GetMapping("/management/deleteMenu")
-    public Result deleteMenu(@RequestParam String groupno){
-        return menuService.deleteMenu(groupno);
+    @PostMapping("/management/deleteMenu")
+    public Result deleteMenu(@RequestBody List<String> groupnoList){
+        return menuService.deleteMenu(groupnoList);
+    }
+
+    //分页获取指定类别和组别下的QA资料
+    @GetMapping("/api/getQA")
+    public PageResult getQA(String category, String group,
+                            @PageableDefault(page = 0, size = 10) Pageable pageable){
+        return qaService.getQA(category, group, pageable);
     }
 
     //增加QA资料
@@ -56,10 +57,10 @@ public class DataManagementController {
         return qaService.addQA(qa);
     }
 
-    //删除QA资料
-    @GetMapping("/management/deleteQA")
-    public Result deleteQA(@RequestParam String itemno){
-        return qaService.deleteQA(itemno);
+    //批量删除QA资料
+    @PostMapping("/management/deleteQA")
+    public Result deleteQAList(@RequestBody List<String> itemnoList){
+        return qaService.deleteQAList(itemnoList);
     }
 
     //修改QA资料

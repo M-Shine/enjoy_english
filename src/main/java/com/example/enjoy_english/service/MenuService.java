@@ -4,6 +4,7 @@ import com.example.enjoy_english.model.Menu;
 import com.example.enjoy_english.tools.Result;
 
 import java.util.HashMap;
+import java.util.List;
 
 public interface MenuService {
     // 查询全部菜单选项
@@ -11,7 +12,7 @@ public interface MenuService {
     //添加菜单选项
     Result addMenu(Menu menu);
     //删除菜单选项
-    Result deleteMenu(String groupno);
+    Result deleteMenu(List<String> groupnoList);
     //修改菜单选项
     Result updateMenu(Menu menu);
 }

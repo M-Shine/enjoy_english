@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface QARepository extends JpaRepository<QA, String> {
     Page<QA> findAllByCategoryAndGroup(String category, String group, Pageable pageable);
 
@@ -27,5 +29,8 @@ public interface QARepository extends JpaRepository<QA, String> {
             , nativeQuery = true)
     int updateQA(QA qa);
 
-    int deleteByItemno(String itemno);
+    @Transactional
+    @Modifying
+    @Query(value = "delete from QA where item_no in (?1)")
+    int deleteQA(List<String> itemnoList);
 }

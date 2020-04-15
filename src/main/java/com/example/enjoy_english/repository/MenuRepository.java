@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface MenuRepository extends JpaRepository<Menu, String> {
     Menu findByCategoryAndGroup(String category, String group);
 
@@ -16,8 +18,8 @@ public interface MenuRepository extends JpaRepository<Menu, String> {
 
     @Transactional
     @Modifying
-    @Query(value = "delete from Menu where group_no=?1")
-    int deleteByGroupno(String groupno);
+    @Query(value = "delete from Menu where group_no in (?1)")
+    int deleteByGroupnoList(List<String> groupnoList);
 
     @Transactional
     @Modifying
