@@ -1,11 +1,10 @@
 package com.example.enjoy_english.controller;
 
 import com.example.enjoy_english.model.User;
+import com.example.enjoy_english.service.FeedbackService;
 import com.example.enjoy_english.service.UserService;
-import com.example.enjoy_english.tools.PageResult;
 import com.example.enjoy_english.tools.Result;
 import com.example.enjoy_english.tools.VerificationCode;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,11 +17,14 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 @RestController
 public class UserManagementController {
     @Resource
     private UserService userService;
+    @Resource
+    private FeedbackService feedbackService;
 
     //获取验证码
     @GetMapping("/verificationCode")
@@ -34,14 +36,13 @@ public class UserManagementController {
     }
 
     //查询所有用户资料
-    @GetMapping("/management/getUsers")
-    public PageResult getUsers(@PageableDefault(page = 0, size = 10) Pageable pageable){
-        Page<User> userPage = userService.findAll(pageable);
-        return new PageResult().success(null, userPage.getContent(), userPage.getTotalPages(), userPage.getNumber(), userPage.getSize());
+    @GetMapping("/management/getUser")
+    public Result getUsers(@PageableDefault(page = 0, size = 10) Pageable pageable){
+        return userService.findAll(pageable);
     }
 
     //查询用户个人资料
-    @GetMapping("/api/getUser")
+    @GetMapping("/api/getUserByAccno")
     public Result getUser(@RequestParam String accno){
         String current_accno = SecurityContextHolder.getContext().getAuthentication().getName();
         //普通用户只能查询自身资料
@@ -73,6 +74,35 @@ public class UserManagementController {
     @GetMapping("/management/deleteUser")
     public Result deleteUser(@RequestParam String accno){
         return userService.deleteByAccno(accno);
+    }
+
+    //查询用户反馈记录
+    @GetMapping("/management/getFeedback")
+    public Result getFeedback(@PageableDefault(page = 0, size = 10) Pageable pageable,
+                              String accno, String startDatetime, String endDatetime, String keyword,
+                              @RequestParam(defaultValue = "0") float minReward,
+                              @RequestParam(defaultValue = "0") float maxReward){
+        return feedbackService.findAll(pageable, accno, startDatetime, endDatetime, minReward, maxReward, keyword);
+    }
+
+    //增加反馈记录
+    @PostMapping("/api/addFeedback")
+    public Result addFeedback(@RequestBody Map<String, Object> data){
+        String current_accno = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (data.get("accno") == null){
+            return new Result().error("账号不存在");
+        }
+        if (isAdmin() || current_accno.equals(data.get("accno"))){
+            return feedbackService.addFeedback(data);
+        } else {
+            return new Result().error("权限不足");
+        }
+    }
+
+    //修改反馈记录
+    @PostMapping("/management/updateFeedback")
+    public Result updateFeedback(@RequestBody Map<String, Object> data){
+        return feedbackService.updateFeedback(data);
     }
 
     private String getRole(){

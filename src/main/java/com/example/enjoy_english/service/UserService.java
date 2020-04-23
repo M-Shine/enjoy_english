@@ -2,7 +2,6 @@ package com.example.enjoy_english.service;
 
 import com.example.enjoy_english.model.User;
 import com.example.enjoy_english.tools.Result;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
@@ -15,5 +14,5 @@ public interface UserService {
     // 删除用户
     Result deleteByAccno(String accno);
     // 查询所有用户
-    Page<User> findAll(Pageable pageable);
+    Result findAll(Pageable pageable);
 }

@@ -20,10 +20,16 @@ public class DataManagementController {
     @Resource
     private QAService qaService;
 
-    //获取全部菜单选项
+    //查询全部菜单选项
     @GetMapping("/api/getMenus")
     public Result getMenus(){
         return new Result().success(null, menuService.findAll());
+    }
+
+    //按条件查询菜单选项
+    @GetMapping("/management/searchMenu")
+    public Result searchMenu(String groupno, String category, String group){
+        return menuService.search(groupno, category, group);
     }
 
     //添加菜单选项
@@ -49,6 +55,12 @@ public class DataManagementController {
     public PageResult getQA(String category, String group,
                             @PageableDefault(page = 0, size = 10) Pageable pageable){
         return qaService.getQA(category, group, pageable);
+    }
+
+    @GetMapping("/management/searchQA")
+    public Result searchQA(String itemno, String category, String group, String keywordItemq, String keywordItema,
+                        @PageableDefault(page = 0, size = 10) Pageable pageable){
+        return qaService.searchQA(itemno, category, group, keywordItemq, keywordItema, pageable);
     }
 
     //增加QA资料

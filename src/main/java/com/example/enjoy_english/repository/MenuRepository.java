@@ -27,4 +27,10 @@ public interface MenuRepository extends JpaRepository<Menu, String> {
     int updateMenu(Menu menu);
 
     Menu findByGroupno(String groupno);
+
+    @Query(value = "select * from menu where 1=1" +
+            " and (?1 is null or group_no = ?1)" +
+            " and (?2 is null or category like ?2)" +
+            " and (?3 is null or `group` like ?3)", nativeQuery = true)
+    List<Menu> search(String groupno, String category, String group);
 }

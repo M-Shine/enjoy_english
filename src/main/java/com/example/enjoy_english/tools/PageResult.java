@@ -1,9 +1,6 @@
 package com.example.enjoy_english.tools;
 
-public class PageResult {
-    private int status;
-    private String message;
-    private Object data;
+public class PageResult extends Result{
     private int pagenum;
     private int page;
     private int size;
@@ -11,9 +8,7 @@ public class PageResult {
     public PageResult(){}
 
     public PageResult(int status, String message, Object data, int pagenum, int page, int size){
-        this.status = status;
-        this.message = message;
-        this.data = data;
+        super(status, message, data);
         this.pagenum = pagenum;
         this.page = page;
         this.size = size;
@@ -25,30 +20,6 @@ public class PageResult {
 
     public PageResult error(String message){
         return new PageResult(0, message, null, 0, 0, 0);
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
     }
 
     public int getPage() {

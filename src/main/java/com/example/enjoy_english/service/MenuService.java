@@ -15,4 +15,6 @@ public interface MenuService {
     Result deleteMenu(List<String> groupnoList);
     //修改菜单选项
     Result updateMenu(Menu menu);
+    //根据条件查询菜单选项
+    Result search(String groupno, String category, String group);
 }

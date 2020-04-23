@@ -13,7 +13,13 @@ import java.util.List;
 public interface QARepository extends JpaRepository<QA, String> {
     Page<QA> findAllByCategoryAndGroup(String category, String group, Pageable pageable);
 
-    QA findByItemno(String itemno);
+    @Query(value = "select * from qa where 1=1" +
+            " and (?1 is null or item_no = ?1)" +
+            " and (?2 is null or category = ?2)" +
+            " and (?3 is null or `group` = ?3)" +
+            " and (?4 is null or item_q like ?4)" +
+            " and (?5 is null or item_a like ?5)", nativeQuery = true)
+    Page<QA> search(String itemno, String category, String group, String keywordItemq, String keywordItema, Pageable pageable);
 
     @Transactional
     @Modifying

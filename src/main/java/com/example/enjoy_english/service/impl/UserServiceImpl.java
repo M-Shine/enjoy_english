@@ -3,6 +3,7 @@ package com.example.enjoy_english.service.impl;
 import com.example.enjoy_english.model.User;
 import com.example.enjoy_english.repository.UserRepository;
 import com.example.enjoy_english.service.UserService;
+import com.example.enjoy_english.tools.PageResult;
 import com.example.enjoy_english.tools.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,10 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Page<User> findAll(Pageable pageable){
-        return userRepository.findAll(pageable);
+    public Result findAll(Pageable pageable){
+        Page<User> userPage = userRepository.findAll(pageable);
+        return new PageResult().success(
+                null, userPage.getContent(), userPage.getTotalPages(), userPage.getNumber(), userPage.getSize());
     }
 
     @Override

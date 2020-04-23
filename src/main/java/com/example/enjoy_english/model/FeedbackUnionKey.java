@@ -1,29 +1,33 @@
 package com.example.enjoy_english.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Embeddable
 public class FeedbackUnionKey implements Serializable {
     @Column(name = "edit_date_time")
-    private String editdatetime;
+    private Timestamp editdatetime;
     @Column(name = "acc_no")
     private String accno;
 
     public FeedbackUnionKey() { }
 
-    public FeedbackUnionKey(String editdatetime, String accno) {
+    public FeedbackUnionKey(Timestamp editdatetime, String accno) {
         this.editdatetime = editdatetime;
         this.accno = accno;
     }
 
-    public String getEditdatetime() {
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    public Timestamp getEditdatetime() {
         return editdatetime;
     }
 
-    public void setEditdatetime(String editdatetime) {
+    public void setEditdatetime(Timestamp editdatetime) {
         this.editdatetime = editdatetime;
     }
 

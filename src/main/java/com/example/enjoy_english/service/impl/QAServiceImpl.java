@@ -25,16 +25,11 @@ public class QAServiceImpl implements QAService {
     private MenuRepository menuRepository;
 
     @Override
-    public Page<QA> findAllByCategoryAndGroup(String category, String group, Pageable pageable) {
-        return qaRepository.findAllByCategoryAndGroup(category, group, pageable);
-    }
-
-    @Override
     public PageResult getQA(String category, String group, Pageable pageable) {
         if (isEmpty(category) || isEmpty(group)){
             return new PageResult().error("类别 / 组别 不能为空");
         }
-        Page<QA> qaPage = findAllByCategoryAndGroup(category, group, pageable);
+        Page<QA> qaPage = qaRepository.findAllByCategoryAndGroup(category, group, pageable);
         List<QA> qaList = qaPage.getContent();
         List<HashMap<String, String>> result = new ArrayList<>();
         for (QA qa : qaList){
@@ -45,6 +40,31 @@ public class QAServiceImpl implements QAService {
             result.add(map);
         }
         return new PageResult().success(null, result, qaPage.getTotalPages(), qaPage.getNumber(), qaPage.getSize());
+    }
+
+    @Override
+    public Result searchQA(String itemno, String category, String group, String keywordItemq, String keywordItema, Pageable pageable) {
+        if (isEmpty(itemno)){
+            itemno = null;
+        }
+        if (isEmpty(category)){
+            category = null;
+        }
+        if (isEmpty(group)){
+            group = null;
+        }
+        if (isEmpty(keywordItemq)){
+            keywordItemq = null;
+        }else {
+            keywordItemq = "%" + keywordItemq + "%";
+        }
+        if (isEmpty(keywordItema)){
+            keywordItema = null;
+        }else {
+            keywordItema = "%" + keywordItema + "%";
+        }
+        Page<QA> qaPage = qaRepository.search(itemno, category, group, keywordItemq, keywordItema, pageable);
+        return new PageResult().success(null, qaPage.getContent(), qaPage.getTotalPages(), qaPage.getNumber(), qaPage.getSize());
     }
 
     @Override

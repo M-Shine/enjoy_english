@@ -73,6 +73,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
+    //验证码校验
     private void checkCode(String code, String verificationCode) {
         if (verificationCode == null || code == null || "".equals(code) || !verificationCode.toLowerCase().equals(code.toLowerCase())) {
             throw new AuthenticationServiceException("验证码输入错误");

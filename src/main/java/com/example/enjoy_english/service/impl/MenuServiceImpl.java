@@ -35,6 +35,24 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public Result search(String groupno, String category, String group){
+        if (isEmpty(groupno)){
+            groupno = null;
+        }
+        if (isEmpty(category)){
+            category = null;
+        }else {
+            category = "%" + category + "%";
+        }
+        if (isEmpty(group)){
+            group = null;
+        }else {
+            group = "%" + group + "%";
+        }
+        return new Result().success(null, menuRepository.search(groupno, category, group));
+    }
+
+    @Override
     public Result addMenu(Menu menu) {
         if (!isLegal(menu.getCategory()) || !isLegal(menu.getGroup())){
             return new Result().error("类别 / 组别 填写错误");
@@ -72,4 +90,10 @@ public class MenuServiceImpl implements MenuService {
         return true;
     }
 
+    boolean isEmpty(String str){
+        if (str == null || str.trim().isEmpty()){
+            return true;
+        }
+        return false;
+    }
 }
