@@ -73,6 +73,9 @@ public class QAServiceImpl implements QAService {
         if (result.getStatus() == 0){
             return result;
         }
+        if (menuRepository.findByCategoryAndGroup(qa.getCategory(), qa.getGroup()) == null){
+            return new Result().error("类别 & 组别 不存在");
+        }
         qa.setItemno(UUID.randomUUID().toString());
         qaRepository.addQA(qa);
         return new Result().success("添加QA资料成功", qa);
@@ -85,7 +88,19 @@ public class QAServiceImpl implements QAService {
         if (result.getStatus() == 0){
             return result;
         }
-        qaRepository.updateQA(qa);
+        QA oldQA = qaRepository.findByItemno(qa.getItemno());
+        if (oldQA == null){
+            return new Result().error("指标号为 " + qa.getItemno() + " 的QA资料不存在");
+        }
+        if (!oldQA.getCategory().equals(qa.getCategory()) || !oldQA.getGroup().equals(qa.getGroup())){
+            if (menuRepository.findByCategoryAndGroup(qa.getCategory(), qa.getGroup()) == null){
+                return new Result().error("类别 & 组别 不存在");
+            }
+        }
+        int statu = qaRepository.updateQA(qa);
+        if(statu <= 0){
+            return new Result().error("修改失败");
+        }
         return new Result().success("修改QA资料成功", qa);
     }
 
@@ -103,9 +118,6 @@ public class QAServiceImpl implements QAService {
     }
 
     Result isLegal(QA qa){
-        if (menuRepository.findByCategoryAndGroup(qa.getCategory(), qa.getGroup()) == null){
-            return new Result().error("类别 & 组别 不存在");
-        }
         if (isEmpty(qa.getItemq()) || isEmpty(qa.getItema())){
             return new Result().error("问题 / 答案 不能为空");
         }

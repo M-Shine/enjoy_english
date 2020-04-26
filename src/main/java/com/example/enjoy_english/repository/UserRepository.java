@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, String> {
     User findByAccno(String accno);
-    void deleteByAccno(String accno);
+    int deleteByAccno(String accno);
     Page<User> findAll(Pageable pageable);
 }

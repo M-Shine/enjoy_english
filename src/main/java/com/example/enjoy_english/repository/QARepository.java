@@ -39,4 +39,6 @@ public interface QARepository extends JpaRepository<QA, String> {
     @Modifying
     @Query(value = "delete from QA where item_no in (?1)")
     int deleteQA(List<String> itemnoList);
+
+    QA findByItemno(String itemno);
 }

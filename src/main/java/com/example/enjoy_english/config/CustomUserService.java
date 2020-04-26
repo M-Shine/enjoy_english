@@ -21,7 +21,7 @@ public class CustomUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByAccno(username);
+        User user = userService.findUser(username);
         // 查询不到用户
         if (user == null){
             throw new UsernameNotFoundException("用户不存在！");

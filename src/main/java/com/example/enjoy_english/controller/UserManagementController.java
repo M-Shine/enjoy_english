@@ -33,6 +33,7 @@ public class UserManagementController {
         BufferedImage image = verificationCode.getImage();
         session.setAttribute("verificationCode", verificationCode.getText());
         VerificationCode.output(image, response.getOutputStream());
+//        ImageIO.write(image, "JPEG", response.getOutputStream());
     }
 
     //查询所有用户资料
@@ -49,7 +50,7 @@ public class UserManagementController {
         if (!isAdmin() && !current_accno.equals(accno)){
             return new Result().error("权限不足");
         }
-        return new Result().success(null, userService.findByAccno(accno));
+        return userService.findByAccno(accno);
     }
 
     //注册新用户
@@ -64,16 +65,19 @@ public class UserManagementController {
         String current_accno = SecurityContextHolder.getContext().getAuthentication().getName();
         //管理员可修改所有用户的资料，用户只能修改自己的资料
         if (isAdmin() || current_accno.equals(user.getAccno())){
-            return userService.updateUser(user, isAdmin());
+            return userService.updateUser(user);
         } else {
             return new Result().error("权限不足");
         }
     }
 
     //删除用户个人资料
-    @GetMapping("/management/deleteUser")
-    public Result deleteUser(@RequestParam String accno){
-        return userService.deleteByAccno(accno);
+    @PostMapping("/management/deleteUser")
+    public Result deleteUser(@RequestBody Map data){
+        if (data.get("accno") == null){
+            return new Result().error("删除失败：用户名不能为空");
+        }
+        return userService.deleteByAccno(data.get("accno").toString());
     }
 
     //查询用户反馈记录
@@ -92,7 +96,7 @@ public class UserManagementController {
         if (data.get("accno") == null){
             return new Result().error("账号不存在");
         }
-        if (isAdmin() || current_accno.equals(data.get("accno"))){
+        if (current_accno.equals(data.get("accno"))){
             return feedbackService.addFeedback(data);
         } else {
             return new Result().error("权限不足");
