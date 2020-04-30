@@ -12,8 +12,11 @@ public class Feedback {
     // 联合主键，包含editdatetime和accno
     @Id
     private FeedbackUnionKey feedbackUnionKey;
+
     private String content;
-    private float reward;
+
+    private float reward = 0;
+
     @Column(name = "show_out")
     // 默认展示，不赋值的话该变量会被默认初始化为false
     private boolean showout = true;

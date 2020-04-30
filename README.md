@@ -35,5 +35,3 @@
 |1|查询用户反馈记录|/management/getFeedback|
 |2|添加用户反馈|/api/addFeedback|
 |3|修改反馈记录显示状态|/management/updateFeedback|
-
-## 后端接口开发已完成，等待项目部署上云以及测试维护

@@ -8,9 +8,13 @@ import com.example.enjoy_english.tools.PageResult;
 import com.example.enjoy_english.tools.Result;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @RestController
@@ -34,13 +38,23 @@ public class DataManagementController {
 
     //添加菜单选项
     @PostMapping("/management/addMenu")
-    public Result addMenu(@RequestBody Menu menu){
+    public Result addMenu(@Valid @RequestBody Menu menu, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            for (ObjectError error : bindingResult.getAllErrors()){
+                return new Result().error(error.getDefaultMessage());
+            }
+        }
         return menuService.addMenu(menu);
     }
 
     //修改菜单项
     @PostMapping("/management/updateMenu")
-    public Result updateMenu(@RequestBody Menu menu){
+    public Result updateMenu(@Valid @RequestBody Menu menu, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            for (ObjectError error : bindingResult.getAllErrors()){
+                return new Result().error(error.getDefaultMessage());
+            }
+        }
         return menuService.updateMenu(menu);
     }
 
@@ -52,7 +66,8 @@ public class DataManagementController {
 
     //分页获取指定类别和组别下的QA资料
     @GetMapping("/api/getQA")
-    public PageResult getQA(String category, String group,
+    public PageResult getQA(@NotBlank(message = "类别不能为空") String category,
+                            @NotBlank(message = "组别不能为空") String group,
                             @PageableDefault(page = 0, size = 10) Pageable pageable){
         return qaService.getQA(category, group, pageable);
     }
@@ -65,7 +80,12 @@ public class DataManagementController {
 
     //增加QA资料
     @PostMapping("/management/addQA")
-    public Result addQA(@RequestBody QA qa){
+    public Result addQA(@Valid @RequestBody QA qa, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            for (ObjectError error : bindingResult.getAllErrors()){
+                return new Result().error(error.getDefaultMessage());
+            }
+        }
         return qaService.addQA(qa);
     }
 
@@ -77,7 +97,12 @@ public class DataManagementController {
 
     //修改QA资料
     @PostMapping("/management/updateQA")
-    public Result updateQA(@RequestBody QA qa){
+    public Result updateQA(@Valid @RequestBody QA qa, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            for (ObjectError error : bindingResult.getAllErrors()){
+                return new Result().error(error.getDefaultMessage());
+            }
+        }
         return qaService.updateQA(qa);
     }
 

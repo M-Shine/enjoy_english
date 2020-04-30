@@ -54,9 +54,6 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Result addMenu(Menu menu) {
-        if (!isLegal(menu.getCategory()) || !isLegal(menu.getGroup())){
-            return new Result().error("类别 / 组别 填写错误");
-        }
         if (menuRepository.findByCategoryAndGroup(menu.getCategory(), menu.getGroup()) != null){
             return new Result().error("该菜单选项已存在");
         }
@@ -73,21 +70,11 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Result updateMenu(Menu menu) {
-        if (!isLegal(menu.getCategory()) || !isLegal(menu.getGroup())){
-            return new Result().error("类别 / 组别 填写错误");
-        }
         if (menuRepository.findByGroupno(menu.getGroupno()) == null){
             return new Result().error("组代码为" + menu.getGroupno() + "的菜单项不存在");
         }
         menuRepository.updateMenu(menu);
         return new Result().success("组代码为" + menu.getGroupno() + "的菜单项已修改", menu);
-    }
-
-    boolean isLegal(String str){
-        if (str == null || str.trim().isEmpty() || str.length() > 20){
-            return false;
-        }
-        return true;
     }
 
     boolean isEmpty(String str){

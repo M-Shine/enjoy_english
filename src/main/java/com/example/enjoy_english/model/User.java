@@ -1,8 +1,12 @@
 package com.example.enjoy_english.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -10,15 +14,28 @@ import java.sql.Timestamp;
 @Table(name = "user")
 public class User implements Serializable {
     @Id
+//    @NotBlank(message = "用户名不能为空")
+//    @Length(min = 1, max = 20, message = "用户名长度需在 1 至 20 个字符范围内")
     @Column(name = "acc_no")
     private String accno;
+
+//    @Length(max = 64, message = "密码最大不能超过64个字符")
+    @JsonIgnore
     private String password;
+
     private String name;
+
     @Column(name = "tel_no")
     private String telno;
+
     // 角色默认值为1，不赋值的话该变量会被默认初始化为0
+    @JsonIgnore
+//    @NotNull
     private int role = 1;
+
     @Column(name = "register_datetime")
+//    @NotNull
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Timestamp registerdatetime;
 
     public String getAccno() {
@@ -29,7 +46,6 @@ public class User implements Serializable {
         this.accno = accno;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     public Timestamp getRegisterdatetime() {
         return registerdatetime;
     }

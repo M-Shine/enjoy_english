@@ -26,9 +26,6 @@ public class QAServiceImpl implements QAService {
 
     @Override
     public PageResult getQA(String category, String group, Pageable pageable) {
-        if (isEmpty(category) || isEmpty(group)){
-            return new PageResult().error("类别 / 组别 不能为空");
-        }
         Page<QA> qaPage = qaRepository.findAllByCategoryAndGroup(category, group, pageable);
         List<QA> qaList = qaPage.getContent();
         List<HashMap<String, String>> result = new ArrayList<>();
@@ -69,10 +66,6 @@ public class QAServiceImpl implements QAService {
 
     @Override
     public Result addQA(QA qa) {
-        Result result = isLegal(qa);
-        if (result.getStatus() == 0){
-            return result;
-        }
         if (menuRepository.findByCategoryAndGroup(qa.getCategory(), qa.getGroup()) == null){
             return new Result().error("类别 & 组别 不存在");
         }
@@ -84,10 +77,6 @@ public class QAServiceImpl implements QAService {
     @Transactional
     @Override
     public Result updateQA(QA qa){
-        Result result = isLegal(qa);
-        if (result.getStatus() == 0){
-            return result;
-        }
         QA oldQA = qaRepository.findByItemno(qa.getItemno());
         if (oldQA == null){
             return new Result().error("指标号为 " + qa.getItemno() + " 的QA资料不存在");
@@ -115,16 +104,6 @@ public class QAServiceImpl implements QAService {
             return true;
         }
         return false;
-    }
-
-    Result isLegal(QA qa){
-        if (isEmpty(qa.getItemq()) || isEmpty(qa.getItema())){
-            return new Result().error("问题 / 答案 不能为空");
-        }
-        if (qa.getItemq().length() > 30 || qa.getItema().length() > 30){
-            return new Result().error("问题 / 答案 长度超过限制（30个字符）");
-        }
-        return new Result().success(null, qa);
     }
 
 }

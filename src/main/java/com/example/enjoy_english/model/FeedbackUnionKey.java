@@ -11,7 +11,9 @@ import java.util.Objects;
 @Embeddable
 public class FeedbackUnionKey implements Serializable {
     @Column(name = "edit_date_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Timestamp editdatetime;
+
     @Column(name = "acc_no")
     private String accno;
 
@@ -22,7 +24,6 @@ public class FeedbackUnionKey implements Serializable {
         this.accno = accno;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     public Timestamp getEditdatetime() {
         return editdatetime;
     }

@@ -5,6 +5,7 @@ import com.example.enjoy_english.repository.UserRepository;
 import com.example.enjoy_english.service.UserService;
 import com.example.enjoy_english.tools.PageResult;
 import com.example.enjoy_english.tools.Result;
+import com.example.enjoy_english.tools.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +15,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 
@@ -31,13 +32,13 @@ public class UserServiceImpl implements UserService {
     public Result findAll(Pageable pageable){
         Page<User> userPage = userRepository.findAll(pageable);
         List<User> userList = userPage.getContent();
-        List<Map> resultUserList = new ArrayList<>();
+        List<User> resultUserList = new ArrayList<>();
         for (User user : userList){
-            if (user.getRole() == 0){
+            if (user.getRole() == UserRoles.ADMIN.getRole()){
                 // 跳过管理员账号
                 continue;
             }
-            resultUserList.add( getResultUser(user) );
+            resultUserList.add( user );
         }
         return new PageResult().success(
                 null, resultUserList, userPage.getTotalPages(), userPage.getNumber(), userPage.getSize());
@@ -52,9 +53,9 @@ public class UserServiceImpl implements UserService {
     public Result findByAccno(String accno){
         User user = userRepository.findByAccno(accno);
         if (user == null){
-            return new Result().error("查询失败，不存在用户名为 " + accno + " 的用户");
+            return new Result().error("不存在用户名为 " + accno + " 的用户");
         }
-        return new Result().success(null, getResultUser(user));
+        return new Result().success(null, user);
     }
 
     @Override
@@ -83,14 +84,14 @@ public class UserServiceImpl implements UserService {
             return new Result().error("电话号码格式错误");
         }
         //设置用户角色为普通用户
-        user.setRole(1);
+        user.setRole( UserRoles.NORMAL.getRole() );
         //设置注册时间
         user.setRegisterdatetime(new Timestamp(new Date().getTime()));
         User newUser = userRepository.save(user);
         if (newUser == null){
             return new Result().error("注册失败");
         }
-        return new Result(1, "注册账户成功", getResultUser(newUser));
+        return new Result(1, "注册账户成功", newUser);
     }
 
     @Transactional
@@ -115,7 +116,7 @@ public class UserServiceImpl implements UserService {
             if (user.getPassword().trim().equals("") || user.getPassword().length() > 32){
                 return new Result().error("密码格式错误");
             }
-            oldUser.setPassword(user.getPassword());
+            oldUser.setPassword(passwordEncoder.encode(user.getPassword()));
         }
 
         if (user.getName() != null){
@@ -138,7 +139,7 @@ public class UserServiceImpl implements UserService {
         if (newUser == null){
             return new Result().error("更新用户信息失败");
         }
-        return new Result().success("资料修改成功", getResultUser(newUser));
+        return new Result().success("资料修改成功", newUser);
     }
 
     private boolean isTelphoneNum(String str){
@@ -146,14 +147,4 @@ public class UserServiceImpl implements UserService {
         return pattern.matcher(str).matches();
     }
 
-    private Map getResultUser(User user){
-        Map<String, Object> resultUser = new HashMap<>();
-        resultUser.put("accno", user.getAccno());
-        resultUser.put("password", user.getPassword());
-        resultUser.put("name", user.getName());
-        resultUser.put("telno", user.getTelno());
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        resultUser.put("registerdatetime", dateFormat.format(user.getRegisterdatetime()));
-        return resultUser;
-    }
 }

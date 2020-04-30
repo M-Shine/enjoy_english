@@ -9,11 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collection;
@@ -33,7 +36,6 @@ public class UserManagementController {
         BufferedImage image = verificationCode.getImage();
         session.setAttribute("verificationCode", verificationCode.getText());
         VerificationCode.output(image, response.getOutputStream());
-//        ImageIO.write(image, "JPEG", response.getOutputStream());
     }
 
     //查询所有用户资料
@@ -61,7 +63,12 @@ public class UserManagementController {
 
     //更新用户信息
     @PostMapping("/api/updateUser")
-    public Result updateUser(@RequestBody User user){
+    public Result updateUser(@Valid @RequestBody User user, BindingResult bindingResult){
+        if (bindingResult.hasErrors()){
+            for (ObjectError error : bindingResult.getAllErrors()){
+                return new Result().error(error.getDefaultMessage());
+            }
+        }
         String current_accno = SecurityContextHolder.getContext().getAuthentication().getName();
         //管理员可修改所有用户的资料，用户只能修改自己的资料
         if (isAdmin() || current_accno.equals(user.getAccno())){
