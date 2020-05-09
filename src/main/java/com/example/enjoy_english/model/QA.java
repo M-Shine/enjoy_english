@@ -28,10 +28,22 @@ public class QA implements Serializable {
     @NotBlank(message = "问题不能为空")
     @Length(max = 30, message = "问题不能超过30个字符")
     private String itemq;
+
     @Column(name = "item_a")
     @NotBlank(message = "答案不能为空")
     @Length(max = 30, message = "答案不能超过30个字符")
     private String itema;
+
+    @Override
+    public String toString() {
+        return "QA{" +
+                "itemno='" + itemno + '\'' +
+                ", category='" + category + '\'' +
+                ", group='" + group + '\'' +
+                ", itemq='" + itemq + '\'' +
+                ", itema='" + itema + '\'' +
+                '}';
+    }
 
     public String getItemno() {
         return itemno;

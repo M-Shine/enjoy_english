@@ -9,11 +9,11 @@ import com.example.enjoy_english.tools.Result;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -24,56 +24,36 @@ public class FeedbackServiceImpl implements FeedbackService {
     private FeedbackRepository feedbackRepository;
 
     @Override
-    public Result addFeedback(Map<String, Object> data) {
-        if (data.get("accno") == null){
-            return new Result().error("账号不存在");
-        }
-
-        float reward = 0;
-        Object rewardObject = data.get("reward");
-        Pattern pattern = Pattern.compile("\\d{1,6}[.]?\\d*");
-        if (rewardObject != null && pattern.matcher(data.get("reward").toString()).matches()){
-            reward = Float.parseFloat(rewardObject.toString());
-            //保留两位小数，四舍五入
-            NumberFormat numberFormat = NumberFormat.getNumberInstance();
-            numberFormat.setMaximumFractionDigits(2);
-            reward = Float.parseFloat(numberFormat.format(reward));
-        }
-        if (reward < 0 || reward > 9999.99){
+    @Transactional
+    public Result addFeedback(Feedback feedback){
+        if (feedback.getReward() < 0 || feedback.getReward() > 9999.99){
             return new Result().error("打赏金额超出限制（最小0，最大9999.99）");
         }
-
-        String content = String.valueOf(data.get("content"));
-        if ((content == null || content.trim().equals("") || content.equals("null")) && reward == 0 ){
+        if ( (feedback.getContent() == null || "".equals(feedback.getContent()) || "null".equals(feedback.getContent())) && feedback.getReward() == 0){
             return new Result().error("无效反馈");
         }
-
-        FeedbackUnionKey feedbackUnionKey = new FeedbackUnionKey(new Timestamp(new Date().getTime()), data.get("accno").toString());
-        Feedback feedback = new Feedback(feedbackUnionKey, content, reward, true);
+        FeedbackUnionKey feedbackUnionKey = feedback.getFeedbackUnionKey();
+        feedbackUnionKey.setEditdatetime(new Timestamp(new Date().getTime()));
+        feedback.setFeedbackUnionKey(feedbackUnionKey);
         feedbackRepository.save(feedback);
-        return new Result().success("反馈成功", null);
+        Map<String, String> map = formatValue(feedback);
+        map.remove("showout");
+        return new Result().success("反馈成功", map);
     }
 
     @Override
-    public Result updateFeedback(Map<String, Object> data) {
-        if (data.get("accno") == null || data.get("editdatetime") == null){
-            return new Result().error("不存在该反馈记录");
+    @Transactional
+    public Result updateFeedback(Feedback feedback){
+        Feedback oldFeedback = feedbackRepository.findById( feedback.getFeedbackUnionKey() ).orElse(null);
+        if (oldFeedback == null){
+            return new Result().error("不存在该反馈记录，请检查用户名与反馈时间是否正确");
         }
-        String accno;
-        Timestamp timestamp;
-        boolean showout;
-        try{
-            accno = data.get("accno").toString();
-            timestamp = Timestamp.valueOf(data.get("editdatetime").toString());
-            showout = (boolean)data.get("showout");
-        } catch (Exception e){
-            e.printStackTrace();
-            return new Result().error("参数传递错误");
+        oldFeedback.setShowout( feedback.getShowout() );
+        int statu = feedbackRepository.updateFeedback( oldFeedback );
+        if ( statu <= 0 ){
+            return new Result().error("修改反馈记录失败");
         }
-        FeedbackUnionKey feedbackUnionKey = new FeedbackUnionKey(timestamp, accno);
-        Feedback feedback = new Feedback(feedbackUnionKey, null, 0, showout);
-        feedbackRepository.updateFeedback(feedback);
-        return new Result().success("修改成功", null);
+        return new Result().success("修改反馈记录成功", oldFeedback);
     }
 
     @Override
@@ -104,7 +84,7 @@ public class FeedbackServiceImpl implements FeedbackService {
             keyword = "%" + keyword + "%";
         }
         Page<Feedback> feedbackPage = feedbackRepository.search(accno, startDatetime, endDatetime, minReward, maxReward, keyword, pageable);
-        return new PageResult().success(null, formatValue(feedbackPage.getContent()),
+        return new PageResult().success(null, getFeedbackList(feedbackPage.getContent()),
                 feedbackPage.getTotalPages(), feedbackPage.getNumber(), feedbackPage.getSize());
     }
 
@@ -115,17 +95,21 @@ public class FeedbackServiceImpl implements FeedbackService {
         return false;
     }
 
-    List formatValue(List<Feedback> feedbackList){
-        List<HashMap> result = new ArrayList<>();
+    Map formatValue(Feedback feedback){
+        Map<String, Object> map = new HashMap<>();
+        map.put("accno", feedback.getFeedbackUnionKey().getAccno());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        map.put("editdatetime", dateFormat.format(feedback.getFeedbackUnionKey().getEditdatetime()));
+        map.put("content", feedback.getContent());
+        map.put("reward", feedback.getReward());
+        map.put("showout", feedback.getShowout());
+        return map;
+    }
+
+    List getFeedbackList(List<Feedback> feedbackList){
+        List<Map> result = new ArrayList<>();
         for (Feedback feedback : feedbackList){
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("accno", feedback.getFeedbackUnionKey().getAccno());
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            map.put("editdatetime", dateFormat.format(feedback.getEditdatetime()));
-            map.put("content", feedback.getContent());
-            map.put("reward", feedback.getReward());
-            map.put("showout", feedback.getShowout());
-            result.add(map);
+            result.add( formatValue(feedback) );
         }
         return result;
     }

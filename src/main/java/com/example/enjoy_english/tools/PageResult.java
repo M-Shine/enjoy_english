@@ -7,6 +7,16 @@ public class PageResult extends Result{
 
     public PageResult(){}
 
+    @Override
+    public String toString() {
+        return "PageResult{" +
+                super.toString() +
+                "pagenum=" + pagenum +
+                ", page=" + page +
+                ", size=" + size +
+                '}';
+    }
+
     public PageResult(int status, String message, Object data, int pagenum, int page, int size){
         super(status, message, data);
         this.pagenum = pagenum;

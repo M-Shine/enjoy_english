@@ -11,13 +11,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -32,13 +32,13 @@ public class UserServiceImpl implements UserService {
     public Result findAll(Pageable pageable){
         Page<User> userPage = userRepository.findAll(pageable);
         List<User> userList = userPage.getContent();
-        List<User> resultUserList = new ArrayList<>();
+        List<Map> resultUserList = new ArrayList<>();
         for (User user : userList){
             if (user.getRole() == UserRoles.ADMIN.getRole()){
                 // 跳过管理员账号
                 continue;
             }
-            resultUserList.add( user );
+            resultUserList.add( formatUser(user) );
         }
         return new PageResult().success(
                 null, resultUserList, userPage.getTotalPages(), userPage.getNumber(), userPage.getSize());
@@ -55,10 +55,11 @@ public class UserServiceImpl implements UserService {
         if (user == null){
             return new Result().error("不存在用户名为 " + accno + " 的用户");
         }
-        return new Result().success(null, user);
+        return new Result().success(null, formatUser(user));
     }
 
     @Override
+    @Transactional
     public Result addUser(User user) {
         //校验用户名
         if (user.getAccno() == null || user.getAccno().trim().equals("") || user.getAccno().length() > 20){
@@ -91,17 +92,17 @@ public class UserServiceImpl implements UserService {
         if (newUser == null){
             return new Result().error("注册失败");
         }
-        return new Result(1, "注册账户成功", newUser);
+        return new Result(1, "注册账户成功", formatUser(newUser));
     }
 
     @Transactional
     @Override
-    public Result deleteByAccno(String accno) {
-        int statu = userRepository.deleteByAccno(accno);
+    public Result deleteByAccno(List<String> accnoList) {
+        int statu = userRepository.deleteByAccno(accnoList);
         if (statu <= 0){
             return new Result().error("删除失败");
         }
-        return new Result().success("账号" + accno + "已删除", null);
+        return new Result().success("已删除", accnoList);
     }
 
     @Transactional
@@ -139,12 +140,22 @@ public class UserServiceImpl implements UserService {
         if (newUser == null){
             return new Result().error("更新用户信息失败");
         }
-        return new Result().success("资料修改成功", newUser);
+        return new Result().success("资料修改成功", formatUser(newUser));
     }
 
     private boolean isTelphoneNum(String str){
         Pattern pattern = Pattern.compile("[0-9]{11}");
         return pattern.matcher(str).matches();
+    }
+
+    private Map formatUser(User user){
+        Map<String, String> resultUser = new HashMap<>();
+        resultUser.put("accno", user.getAccno());
+        resultUser.put("name", user.getName());
+        resultUser.put("telno", user.getTelno());
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        resultUser.put("registerdatetime", dateFormat.format(user.getRegisterdatetime()));
+        return resultUser;
     }
 
 }

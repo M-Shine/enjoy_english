@@ -5,6 +5,7 @@ import com.example.enjoy_english.repository.MenuRepository;
 import com.example.enjoy_english.service.MenuService;
 import com.example.enjoy_english.tools.Result;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuRepository menuRepository;
 
     @Override
-    public HashMap findAll() {
+    public Result findAll() {
         HashMap<String, List> menus = new HashMap<>();
         List<Menu> menuList = menuRepository.findAll();
         for (Menu menu : menuList){
@@ -31,7 +32,7 @@ public class MenuServiceImpl implements MenuService {
             map.put("group", menu.getGroup());
             menus.get(menu.getCategory()).add(map);
         }
-        return menus;
+        return new Result().success(null, menus);
     }
 
     @Override
@@ -53,9 +54,10 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional
     public Result addMenu(Menu menu) {
         if (menuRepository.findByCategoryAndGroup(menu.getCategory(), menu.getGroup()) != null){
-            return new Result().error("该菜单选项已存在");
+            return new Result().error("菜单选项 " + menu.getCategory() + " & " + menu.getGroup() + " 已存在");
         }
         menu.setGroupno(UUID.randomUUID().toString());
         menuRepository.addMenu(menu);
@@ -63,15 +65,20 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional
     public Result deleteMenu(List<String> groupnoList) {
         menuRepository.deleteByGroupnoList(groupnoList);
         return new Result().success("已删除", groupnoList);
     }
 
     @Override
+    @Transactional
     public Result updateMenu(Menu menu) {
         if (menuRepository.findByGroupno(menu.getGroupno()) == null){
             return new Result().error("组代码为" + menu.getGroupno() + "的菜单项不存在");
+        }
+        if (menuRepository.findByCategoryAndGroup(menu.getCategory(), menu.getGroup()) != null){
+            return new Result().error("菜单选项 " + menu.getCategory() + " & " + menu.getGroup() + " 已存在");
         }
         menuRepository.updateMenu(menu);
         return new Result().success("组代码为" + menu.getGroupno() + "的菜单项已修改", menu);

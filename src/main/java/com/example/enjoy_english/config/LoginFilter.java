@@ -57,6 +57,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             }
 
             username = username.trim();
+            password = password.trim();
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
             setDetails(request, authRequest);
 

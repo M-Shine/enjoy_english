@@ -53,4 +53,10 @@ public class FeedbackUnionKey implements Serializable {
     public int hashCode() {
         return Objects.hash(editdatetime, accno);
     }
+
+    @Override
+    public String toString() {
+        return "editdatetime=" + editdatetime +
+                ", accno='" + accno + '\'';
+    }
 }

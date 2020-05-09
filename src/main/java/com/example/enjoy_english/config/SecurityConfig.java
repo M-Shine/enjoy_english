@@ -38,6 +38,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private Log log = new Log();
 
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+//        return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    public CustomUserService customUserService() {
+        return new CustomUserService();
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws  Exception{
         auth.userDetailsService(customUserService()).passwordEncoder(passwordEncoder());
@@ -47,36 +58,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         // 配置不拦截的接口
         web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
-
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-//                .antMatchers("/").permitAll()   //"/"路径下的接口不需要权限
-//                .antMatchers("/management/**").hasRole("ADMIN") //"/management/**"路径下的接口需要有管理员权限
-//                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
-                .anyRequest().permitAll()   // 项目开发期间开放所有接口用于测试，项目正式上线时需删除该语句
-                .and()
-                .logout()
-                .logoutUrl("/logout")   // 注销登录url
-                .logoutSuccessHandler(logoutSuccessHandler())
-                .and()
-                .csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint());
-        http.addFilterAfter(loginFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
-
-    // 密码加密方式：由于项目要求这里不对密码进行加密
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public CustomUserService customUserService() {
-        return new CustomUserService();
     }
 
     @Bean
@@ -97,6 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return loginFilter;
     }
 
+    //登录成功回调
     @Bean
     public AuthenticationSuccessHandler loginAuthenticationSuccessHandler(){
         return new AuthenticationSuccessHandler() {
@@ -116,6 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         };
     }
 
+    //登录失败回调
     @Bean
     public AuthenticationFailureHandler loginAuthenticationFailureHandler(){
         return new AuthenticationFailureHandler() {
@@ -160,4 +143,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             }
         };
     }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+//                .antMatchers("/").permitAll()   //"/"路径下的接口不需要权限
+//                .antMatchers("/management/**").hasRole("ADMIN") //"/management/**"路径下的接口需要有管理员权限
+//                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+                .anyRequest().permitAll()   // 项目开发期间开放所有接口用于测试，项目正式上线时需删除该语句
+                .and()
+                .logout()
+                .logoutUrl("/logout")   // 注销登录url
+                .logoutSuccessHandler(logoutSuccessHandler())
+                .and()
+                .csrf().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint());
+        http.addFilterAfter(loginFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
 }

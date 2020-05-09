@@ -1,5 +1,6 @@
 package com.example.enjoy_english.controller;
 
+import com.example.enjoy_english.model.Feedback;
 import com.example.enjoy_english.model.User;
 import com.example.enjoy_english.service.FeedbackService;
 import com.example.enjoy_english.service.UserService;
@@ -20,7 +21,7 @@ import javax.validation.Valid;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 public class UserManagementController {
@@ -80,11 +81,8 @@ public class UserManagementController {
 
     //删除用户个人资料
     @PostMapping("/management/deleteUser")
-    public Result deleteUser(@RequestBody Map data){
-        if (data.get("accno") == null){
-            return new Result().error("删除失败：用户名不能为空");
-        }
-        return userService.deleteByAccno(data.get("accno").toString());
+    public Result deleteUser(@RequestBody List<String> accnoList){
+        return userService.deleteByAccno(accnoList);
     }
 
     //查询用户反馈记录
@@ -98,13 +96,10 @@ public class UserManagementController {
 
     //增加反馈记录
     @PostMapping("/api/addFeedback")
-    public Result addFeedback(@RequestBody Map<String, Object> data){
+    public Result addFeedback(@RequestBody Feedback feedback){
         String current_accno = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (data.get("accno") == null){
-            return new Result().error("账号不存在");
-        }
-        if (current_accno.equals(data.get("accno"))){
-            return feedbackService.addFeedback(data);
+        if (current_accno.equals( feedback.getFeedbackUnionKey().getAccno() )){
+            return feedbackService.addFeedback( feedback );
         } else {
             return new Result().error("权限不足");
         }
@@ -112,8 +107,8 @@ public class UserManagementController {
 
     //修改反馈记录
     @PostMapping("/management/updateFeedback")
-    public Result updateFeedback(@RequestBody Map<String, Object> data){
-        return feedbackService.updateFeedback(data);
+    public Result updateFeedback(@RequestBody Feedback feedback){
+        return feedbackService.updateFeedback( feedback );
     }
 
     private String getRole(){

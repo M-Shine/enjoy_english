@@ -65,6 +65,7 @@ public class QAServiceImpl implements QAService {
     }
 
     @Override
+    @Transactional
     public Result addQA(QA qa) {
         if (menuRepository.findByCategoryAndGroup(qa.getCategory(), qa.getGroup()) == null){
             return new Result().error("类别 & 组别 不存在");
@@ -94,6 +95,7 @@ public class QAServiceImpl implements QAService {
     }
 
     @Override
+    @Transactional
     public Result deleteQAList(List<String> itemnoList) {
         qaRepository.deleteQA(itemnoList);
         return new Result().success("已删除", itemnoList);

@@ -22,6 +22,15 @@ public class Menu implements Serializable {
     @Length(max = 20, message = "组别名不能超过20个字符")
     private String group;
 
+    @Override
+    public String toString() {
+        return "Menu{" +
+                "groupno='" + groupno + '\'' +
+                ", category='" + category + '\'' +
+                ", group='" + group + '\'' +
+                '}';
+    }
+
     public String getGroupno() {
         return groupno;
     }

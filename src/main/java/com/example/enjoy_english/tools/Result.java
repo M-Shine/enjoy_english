@@ -13,6 +13,15 @@ public class Result {
         this.data = data;
     }
 
+    @Override
+    public String toString() {
+        return "Result{" +
+                "status=" + status +
+                ", message='" + message + '\'' +
+                ", data=" + data.toString() +
+                '}';
+    }
+
     public Result success(String message, Object data){
         return new Result(1, message, data);
     }

@@ -27,7 +27,7 @@ public class DataManagementController {
     //查询全部菜单选项
     @GetMapping("/api/getMenus")
     public Result getMenus(){
-        return new Result().success(null, menuService.findAll());
+        return menuService.findAll();
     }
 
     //按条件查询菜单选项

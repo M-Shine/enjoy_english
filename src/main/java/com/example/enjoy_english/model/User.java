@@ -1,7 +1,6 @@
 package com.example.enjoy_english.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,7 +19,7 @@ public class User implements Serializable {
     private String accno;
 
 //    @Length(max = 64, message = "密码最大不能超过64个字符")
-    @JsonIgnore
+//    @JsonIgnore
     private String password;
 
     private String name;
@@ -29,7 +28,7 @@ public class User implements Serializable {
     private String telno;
 
     // 角色默认值为1，不赋值的话该变量会被默认初始化为0
-    @JsonIgnore
+//    @JsonIgnore
 //    @NotNull
     private int role = 1;
 
@@ -84,5 +83,17 @@ public class User implements Serializable {
 
     public void setRole(int role) {
         this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "accno='" + accno + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", telno='" + telno + '\'' +
+                ", role=" + role +
+                ", registerdatetime=" + registerdatetime +
+                '}';
     }
 }

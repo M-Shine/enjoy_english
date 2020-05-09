@@ -1,21 +1,20 @@
 package com.example.enjoy_english.model;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import java.sql.Timestamp;
 
 @Entity
 @Table(name = "feedback")
 public class Feedback {
-    // 联合主键，包含editdatetime和accno
-    @Id
+    // 联合主键，包含editdatetime和accno\
+    @EmbeddedId
     private FeedbackUnionKey feedbackUnionKey;
 
     private String content;
 
-    private float reward = 0;
+    private double reward;
 
     @Column(name = "show_out")
     // 默认展示，不赋值的话该变量会被默认初始化为false
@@ -23,7 +22,7 @@ public class Feedback {
 
     public Feedback(){}
 
-    public Feedback(FeedbackUnionKey feedbackUnionKey, String content, float reward, boolean showout) {
+    public Feedback(FeedbackUnionKey feedbackUnionKey, String content, double reward, boolean showout) {
         this.feedbackUnionKey = feedbackUnionKey;
         this.content = content;
         this.reward = reward;
@@ -38,21 +37,21 @@ public class Feedback {
         this.feedbackUnionKey = feedbackUnionKey;
     }
 
-    public Timestamp getEditdatetime() {
-        return feedbackUnionKey.getEditdatetime();
-    }
-
-    public void setEditdatetime(Timestamp editdatetime) {
-        feedbackUnionKey.setEditdatetime(editdatetime);
-    }
-
-    public String getAccno() {
-        return feedbackUnionKey.getAccno();
-    }
-
-    public void setAccno(String accno) {
-        feedbackUnionKey.setAccno(accno);
-    }
+//    public Timestamp getEditdatetime() {
+//        return feedbackUnionKey.getEditdatetime();
+//    }
+//
+//    public void setEditdatetime(Timestamp editdatetime) {
+//        feedbackUnionKey.setEditdatetime(editdatetime);
+//    }
+//
+//    public String getAccno() {
+//        return feedbackUnionKey.getAccno();
+//    }
+//
+//    public void setAccno(String accno) {
+//        feedbackUnionKey.setAccno(accno);
+//    }
 
     public String getContent() {
         return content;
@@ -62,11 +61,11 @@ public class Feedback {
         this.content = content;
     }
 
-    public float getReward() {
+    public double getReward() {
         return reward;
     }
 
-    public void setReward(float reward) {
+    public void setReward(double reward) {
         this.reward = reward;
     }
 
@@ -76,5 +75,16 @@ public class Feedback {
 
     public void setShowout(boolean showout) {
         this.showout = showout;
+    }
+
+    @Override
+    public String toString() {
+        return "Feedback{" +
+                "accno='" + feedbackUnionKey.getAccno() + '\'' +
+                ", editdatetime='" + feedbackUnionKey.getEditdatetime() +
+                ", content='" + content + '\'' +
+                ", reward=" + reward +
+                ", showout=" + showout +
+                '}';
     }
 }

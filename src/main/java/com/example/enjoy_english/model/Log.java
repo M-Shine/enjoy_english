@@ -14,9 +14,12 @@ public class Log {
     @Id
     @Column(name = "acc_no")
     private String accno;
+
     private String mac_address;
+
     @Column(name = "login_date_time")
     private Timestamp logindatetime;
+
     @Column(name = "logout_date_time")
     private Timestamp logoutdatetime;
 
