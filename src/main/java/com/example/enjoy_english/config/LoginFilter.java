@@ -15,6 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * 登录拦截验证
+ */
+
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -38,11 +42,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 //验证码校验
                 checkCode(code, verificationCode);
                 //存储用户MAC_ADDRESS
-                mac_address = loginData.get("mac_address");
-                if (!isMacAddress(mac_address)){
-                    throw new AuthenticationServiceException("设备ID验证失败");
-                }
-                request.getSession().setAttribute("mac_address", mac_address);
+//                mac_address = loginData.get("mac_address");
+//                if (!isMacAddress(mac_address)){
+//                    throw new AuthenticationServiceException("设备ID验证失败");
+//                }
+//                request.getSession().setAttribute("mac_address", mac_address);
             }
 
             String username = loginData.get(getUsernameParameter());
@@ -64,11 +68,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             return this.getAuthenticationManager().authenticate(authRequest);
         }else {
             // 处理key/value形式的登录请求
-            mac_address = request.getParameter("mac_address");
-            if (!isMacAddress(mac_address)){
-                throw new AuthenticationServiceException("设备ID验证失败");
-            }
-            request.getSession().setAttribute("mac_address", mac_address);
+//            mac_address = request.getParameter("mac_address");
+//            if (!isMacAddress(mac_address)){
+//                throw new AuthenticationServiceException("设备ID验证失败");
+//            }
+//            request.getSession().setAttribute("mac_address", mac_address);
             checkCode(request.getParameter("code"), verificationCode);
             return super.attemptAuthentication(request, response);
         }

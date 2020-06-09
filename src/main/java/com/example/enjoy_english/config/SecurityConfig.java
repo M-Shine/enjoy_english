@@ -38,17 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private Log log = new Log();
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-//        return NoOpPasswordEncoder.getInstance();
-    }
-
-    @Bean
-    public CustomUserService customUserService() {
-        return new CustomUserService();
-    }
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws  Exception{
         auth.userDetailsService(customUserService()).passwordEncoder(passwordEncoder());
@@ -57,7 +46,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         // 配置不拦截的接口
-        web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
+        web.ignoring().antMatchers("/js/**", "/css/**", "/images/**", "/assets/**");
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/").permitAll()   //"/"路径下的接口不需要权限
+                .antMatchers("/management/**").hasRole("ADMIN") //"/management/**"路径下的接口需要有管理员权限
+                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+//                .anyRequest().permitAll()   // 项目开发期间开放所有接口用于测试，项目正式上线时需删除该语句
+                .and()
+                .logout()
+                .logoutUrl("/logout")   // 注销登录url
+                .logoutSuccessHandler(logoutSuccessHandler())
+                .and()
+                .cors().and().csrf().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint());
+        http.addFilterAfter(loginFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CustomUserService customUserService() {
+        return new CustomUserService();
     }
 
     @Bean
@@ -85,9 +102,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             @Override
             public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
                 //记录登录Log
-                String mac_address = String.valueOf(httpServletRequest.getSession().getAttribute("mac_address"));
+//                String mac_address = String.valueOf(httpServletRequest.getSession().getAttribute("mac_address"));
                 log.setAccno(authentication.getName());
-                log.setMac_address(mac_address);
+//                log.setMac_address(mac_address);
                 log.setLogindatetime(new Timestamp(new Date().getTime()));
                 logService.add(log);
                 //向前端返回信息
@@ -142,24 +159,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 out.write(new ObjectMapper().writeValueAsString(new Result(0, "用户未登录", null)));
             }
         };
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-//                .antMatchers("/").permitAll()   //"/"路径下的接口不需要权限
-//                .antMatchers("/management/**").hasRole("ADMIN") //"/management/**"路径下的接口需要有管理员权限
-//                .antMatchers("/api/**").hasAnyRole("ADMIN", "USER")
-                .anyRequest().permitAll()   // 项目开发期间开放所有接口用于测试，项目正式上线时需删除该语句
-                .and()
-                .logout()
-                .logoutUrl("/logout")   // 注销登录url
-                .logoutSuccessHandler(logoutSuccessHandler())
-                .and()
-                .csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint());
-        http.addFilterAfter(loginFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
 }

@@ -13,6 +13,10 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 配置用户权限
+ */
+
 @Service
 public class CustomUserService implements UserDetailsService {
 

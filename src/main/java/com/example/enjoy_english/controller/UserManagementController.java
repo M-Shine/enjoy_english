@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+//@CrossOrigin
 @RestController
 public class UserManagementController {
     @Resource

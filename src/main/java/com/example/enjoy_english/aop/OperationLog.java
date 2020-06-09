@@ -99,7 +99,9 @@ public class OperationLog {
                 }else if ("Feedback".equals( operation.getObject() )){
                     if (arg instanceof Feedback){
                         Feedback oldValue = feedbackRepository.findById( ((Feedback) arg).getFeedbackUnionKey() ).orElse(null);
-                        operation.setOldvalue(oldValue.toString());
+                        if(oldValue != null){
+                            operation.setOldvalue(oldValue.toString());
+                        }
                     }
                 }
             }
@@ -170,24 +172,5 @@ public class OperationLog {
         String objName = point.getTarget().getClass().getSimpleName().split("ServiceImpl")[0];
         operation.setObject(objName);
     }
-
-//    private List getBeforeObjectList(ProceedingJoinPoint point){
-//        List<Object> objectList = new ArrayList<>();
-//        String objName = point.getTarget().getClass().getSimpleName().split("ServiceImpl")[0];
-//        Object[] args = point.getArgs();
-//        for (Object arg : args){
-//            List<String> ids = (List<String>) arg;
-//            for (String id : ids){
-//                if ("User".equals(objName)){
-//                    objectList.add( userRepository.findByAccno(id) );
-//                }else if ("QA".equals(objName)){
-//                    objectList.add(qaRepository.findByItemno(id));
-//                }else if ("Menu".equals(objName)){
-//                    objectList.add(menuRepository.findByGroupno(id));
-//                }
-//            }
-//        }
-//        return objectList;
-//    }
 
 }
